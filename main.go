@@ -126,6 +126,7 @@ func processData(dg *discordgo.Session, data chan *WFRSS) {
 			dg.WebhookExecute(webhookID, webhookToken, false, &discordgo.WebhookParams{
 				Content: msg,
 			})
+			wf.Item = wf.Item[expiryIndex+1:]
 			ignoreExp[wfi.Guid] = true
 		}
 	}
@@ -195,16 +196,13 @@ func strDateToTime(wf *WFItem) error {
 }
 
 func nearestPubDate(wf []WFItem) (int, float32) {
-	var max float32
-	var index int
+	var max float32 = 0.00
+	var index int = 0
 
-	max = 0.00
-	index = 0
 	now := time.Now()
-
 	for i, el := range wf {
 		if el.PubDate != "" {
-			var value float32 = float32(now.Unix()) / float32(el.PubDateTime.Add(-10*time.Minute).Unix())
+			var value float32 = float32(now.Unix()) / float32(el.PubDateTime.Unix())
 
 			if value > max {
 				max = value
@@ -216,13 +214,10 @@ func nearestPubDate(wf []WFItem) (int, float32) {
 }
 
 func nearestExpiryDate(wf []WFItem) (int, float32) {
-	var max float32
-	var index int
+	var max float32 = 0.00
+	var index int = 0
 
-	max = 0.00
-	index = 0
 	now := time.Now()
-
 	for i, el := range wf {
 		if el.ExpiryDate != "" {
 			var value float32 = float32(now.Unix()) / float32(el.ExpiryDateTime.Unix())
