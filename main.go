@@ -50,7 +50,7 @@ var ignorePubAnt map[string]bool = make(map[string]bool, 1)
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	pattern = regexp.MustCompile(`[\/: \(\)]`)
+	pattern = regexp.MustCompile(`[\/: ]`)
 	ignoreExp = make(map[string]bool, 1)
 	ignorePub = make(map[string]bool, 1)
 	ignorePubAnt = make(map[string]bool, 1)
@@ -292,12 +292,12 @@ func alertMessage(t time.Time, item *WFItem) string {
 		expiry = fmt.Sprintf("***%dm***", int(m))
 	}
 
-	starts := fmt.Sprintf("(%d/%d/%d %d:%d:%d)", lp.Day(), lp.Month(), lp.Year(), lp.Hour(), lp.Minute(), lp.Second())
-	ends := fmt.Sprintf("(%d/%d/%d %d:%d:%d)", le.Day(), le.Month(), le.Year(), le.Hour(), le.Minute(), le.Second())
+	starts := fmt.Sprintf("%d/%d/%d %d:%d:%d", lp.Day(), lp.Month(), lp.Year(), lp.Hour(), lp.Minute(), lp.Second())
+	ends := fmt.Sprintf("%d/%d/%d %d:%d:%d", le.Day(), le.Month(), le.Year(), le.Hour(), le.Minute(), le.Second())
 	starts = addZerosToDateHours(pattern, starts)
 	ends = addZerosToDateHours(pattern, ends)
 
-	ret := fmt.Sprintf("**Titulo:** %s\n**Inicia em:** %s *%s*\n**Expira em:** %s *%s*\n**Tipo:** %s\n\n", item.Title, start, starts, expiry, ends, item.Author)
+	ret := fmt.Sprintf("**Titulo:** %s\n**Inicia em:** %s *(%s)*\n**Expira em:** %s *(%s)*\n**Tipo:** %s\n\n", item.Title, start, starts, expiry, ends, item.Author)
 
 	return ret
 }
