@@ -50,7 +50,7 @@ var ignorePubAnt map[string]bool = make(map[string]bool, 1)
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	pattern = regexp.MustCompile(`[\/: ]`)
+	pattern = regexp.MustCompile(`[\/: \(\)]`)
 	ignoreExp = make(map[string]bool, 1)
 	ignorePub = make(map[string]bool, 1)
 	ignorePubAnt = make(map[string]bool, 1)
