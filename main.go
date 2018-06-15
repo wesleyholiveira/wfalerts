@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"golang.org/x/net/html/charset"
 	"io/ioutil"
 	"net/http"
@@ -15,13 +16,7 @@ import (
 	"time"
 )
 
-const (
-	channelID    = ""
-	token        = ""
-	wfurl        = ""
-	webhookID    = ""
-	webhookToken = ""
-)
+const wfurl = "http://content.warframe.com/dynamic/rss.php"
 
 type WFRSS struct {
 	XMLName xml.Name `xml:"rss"`
@@ -38,6 +33,8 @@ type WFItem struct {
 	PubDateTime    time.Time `xml:"-"`
 	ExpiryDateTime time.Time `xml:"-"`
 }
+
+var token, webhookID, webhookToken string
 
 var msg string
 var wfrss *WFRSS
@@ -72,6 +69,18 @@ func main() {
 
 	dg.Close()
 	<-done
+}
+
+func init() {
+	viper.SetConfigFile("./credentials.json")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
+
+	token = viper.GetString("botToken")
+	webhookID = viper.GetString("webhookID")
+	webhookToken = viper.GetString("webhookToken")
 }
 
 func discord(dg *discordgo.Session) {
@@ -130,8 +139,8 @@ func processData(dg *discordgo.Session, data chan *WFRSS) {
 	pubIndex, ratePub := nearestPubDate(wf.Item)
 	wfi := wf.Item[expiryIndex]
 
-	log.Infoln(rateExp, wfi.ExpiryDateTime.String())
-	log.Infoln("Processing rss")
+	/*log.Infoln(rateExp, wfi.ExpiryDateTime.String())
+	log.Infoln("Processing rss")*/
 	if ignoreExp[wfi.Guid] == false {
 		if rateExp == 1.00 {
 			msg = fmt.Sprintf("**EXPIRADO!!!!**\n%s", alertMessage(now, &wfi))
@@ -171,7 +180,8 @@ func processData(dg *discordgo.Session, data chan *WFRSS) {
 func notification(dg *discordgo.Session, data chan *WFRSS) {
 	c := time.Tick(200 * time.Millisecond)
 	for now := range c {
-		log.Info("Processing notification at: ", now)
+		now.Second()
+		//log.Info("Processing notification at: ", now)
 		go processData(dg, data)
 	}
 }
