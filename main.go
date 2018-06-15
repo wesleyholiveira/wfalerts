@@ -139,8 +139,6 @@ func processData(dg *discordgo.Session, data chan *WFRSS) {
 	pubIndex, ratePub := nearestPubDate(wf.Item)
 	wfi := wf.Item[expiryIndex]
 
-	/*log.Infoln(rateExp, wfi.ExpiryDateTime.String())
-	log.Infoln("Processing rss")*/
 	if ignoreExp[wfi.Guid] == false {
 		if rateExp == 1.00 {
 			msg = fmt.Sprintf("**EXPIRADO!!!!**\n%s", alertMessage(now, &wfi))
@@ -233,8 +231,8 @@ func nearestPubDate(wf []WFItem) (int, float32) {
 	for i, el := range wf {
 		nowUnix := now.Unix()
 		pubUnix := el.PubDateTime.Unix()
-		if el.PubDate != "" && nowUnix >= pubUnix {
-			var value float32 = float32(now.Unix()) / float32(el.PubDateTime.Unix())
+		if el.PubDate != "" {
+			var value float32 = float32(nowUnix) / float32(pubUnix)
 
 			if value > max {
 				max = value
@@ -253,7 +251,7 @@ func nearestExpiryDate(wf []WFItem) (int, float32) {
 	for i, el := range wf {
 		nowUnix := now.Unix()
 		expiryUnix := el.ExpiryDateTime.Unix()
-		if el.ExpiryDate != "" && nowUnix >= expiryUnix {
+		if el.ExpiryDate != "" {
 			var value float32 = float32(nowUnix) / float32(expiryUnix)
 
 			if value > max {
